@@ -24,7 +24,7 @@ jobs:
         run: |
           mkdir -p signing
           SIGNING_PASSWORD="$(openssl rand -hex 24)"
-          keytool -genkeypair -v -storetype JKS +            -keystore signing/dim5lBOT-Android-Updater.jks +            -storepass "$SIGNING_PASSWORD" -keypass "$SIGNING_PASSWORD" +            -alias dim5lbot-updater -keyalg RSA -keysize 4096 -validity 10000 +            -dname "CN=dim5lBOT Android Updater, O=dim5lBOT, C=KR"
+          keytool -genkeypair -v -storetype JKS -keystore signing/dim5lBOT-Android-Updater.jks -storepass "$SIGNING_PASSWORD" -keypass "$SIGNING_PASSWORD" -alias dim5lbot-updater -keyalg RSA -keysize 4096 -validity 10000 -dname "CN=dim5lBOT Android Updater, O=dim5lBOT, C=KR"
           {
             echo "alias=dim5lbot-updater"
             echo "store_password=$SIGNING_PASSWORD"
