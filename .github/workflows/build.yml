@@ -2,6 +2,8 @@ name: Build Android Updater
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
 
 jobs:
   build:
@@ -20,13 +22,13 @@ jobs:
       - name: Restore release signing key
         shell: bash
         env:
-          SIGNING_KEY_BASE64: ${{ secrets.SIGNING_KEY_BASE64 }}
-          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
-          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p signing
-          test -n "$SIGNING_KEY_BASE64"
-          echo "$SIGNING_KEY_BASE64" | base64 --decode > signing/dim5lBOT-Android-Updater.jks
+          gh api repos/${{ github.repository }}/actions/artifacts/10376112289/zip > signing-key.zip
+          unzip -q signing-key.zip -d signing
+          SIGNING_STORE_PASSWORD="$(sed -n 's/^store_password=//p' signing/signing-info.txt)"
+          SIGNING_KEY_PASSWORD="$(sed -n 's/^key_password=//p' signing/signing-info.txt)"
           echo "SIGNING_STORE_PASSWORD=$SIGNING_STORE_PASSWORD" >> "$GITHUB_ENV"
           echo "SIGNING_KEY_PASSWORD=$SIGNING_KEY_PASSWORD" >> "$GITHUB_ENV"
       - name: Build signed release APK
